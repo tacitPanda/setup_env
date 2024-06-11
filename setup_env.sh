@@ -34,11 +34,23 @@ fi
 
 echo "Setting up the directory structure for the CTF challenges"
 
-read -p "Where do you want the CTF directory to be stored? " ctf_dir
+read -p "Where do you want the CTF directory to be stored? Format ex. ~/Documents/target_name " ctf_dir
 
-mkdir -p $ctf_dir && cd $ctf_dir && mkdir scans exploits notes
+dirTest = test -e $ctf_dir
 
-echo "Directory structure created. You can find the CTF directory at $ctf_dir"
+if dirTest == true then
+    echo "Directory already exists. Continuing..."
+    continue
+elif dirTest == false then
+    echo "Directory does not exist. Would you like to create it? (y/n)" response
+    if response == "y"; then
+        mkdir -p $ctf_dir && cd $ctf_dir && mkdir scans exploits notes
+        echo "Directory structure created. You can find the CTF directory at $ctf_dir"
+    else if response == "n"; then
+        echo "No directory created. Exiting..."
+    else
+        echo "Invalid response. Please enter y or n"
+    fi
 
 read -p "Do you have any hostnames you would like to add? (y/n) " response
 
