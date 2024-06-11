@@ -12,22 +12,21 @@ if [ -f ~/.zshrc ]; then
         sed 's/export ip=.*/export ip=$ip_address/' ~/.zshrc
         source ~/.zshrc
         echo "Updated $ip_address in ~/.zshrc"
-        continue
     else
         echo "export ip=$ip_address" >> ~/.zshrc
         source ~/.zshrc
         echo "Added $ip_address to ~/.zshrc"
-        continue
+    fi
 elif [ -f ~/.bashrc ]; then
     if cat ~/.bashrc | grep -q "export ip"; then
         sed 's/export ip=.*/export ip=$ip_address/' ~/.bashrc
         source ~/.bashrc
         echo "Updated $ip_address in ~/.bashrc"
-        continue
     else
         echo "export ip=$ip_address" >> ~/.bashrc
         source ~/.bashrc
         echo "Added $ip_address to ~/.bashrc"
+    fi
 else
     echo "No shell configuration file found. Please add the following line to your shell configuration file: export ip=$ip_address"
 fi
