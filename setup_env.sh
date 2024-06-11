@@ -1,7 +1,7 @@
 #!/bin/bash
 
-print("Welcome to the setup environment script. The purpose of this script is to configure your environment for CTF challenges.")
-print("=========================================================================================================================")
+echo "Welcome to the setup environment script. The purpose of this script is to configure your environment for CTF challenges.")
+echo "=========================================================================================================================")
 
 read -p "What is the IP address of the target machine? " ip_address
 
