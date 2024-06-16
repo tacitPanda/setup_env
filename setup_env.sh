@@ -8,7 +8,7 @@ read -p "What is the IP address of the target machine? " ip_address
 echo "Adding $ip_address to ~/.zshrv or ~/.bashrc depending on your shell. Variable will be "\$ip""
 
 if [ -f ~/.zshrc ]; then
-    if cat ~/.zshrc | grep -q "export ip"; then
+    if grep -q "export ip"; then
         sed 's/export ip=.*/export ip=$ip_address/' ~/.zshrc
         source ~/.zshrc
         echo "Updated $ip_address in ~/.zshrc"
@@ -18,7 +18,7 @@ if [ -f ~/.zshrc ]; then
         echo "Added $ip_address to ~/.zshrc"
     fi
 elif [ -f ~/.bashrc ]; then
-    if [grep -q "export ip" == 0]; then
+    if grep -q "export ip"; then
         sed 's/export ip=.*/export ip=$ip_address/' ~/.bashrc
         source ~/.bashrc
         echo "Updated $ip_address in ~/.bashrc"
