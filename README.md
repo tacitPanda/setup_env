@@ -16,4 +16,3 @@ Follow prompts, be precise with Directory and Variable settings.
 - Sets IP variable for easy usage with various tools
 - Establishes a working directory with clearly named subdirectories for proper organziation
 - Establishes Hostnames in /etc/hosts file for proper redirection and navigation
-
