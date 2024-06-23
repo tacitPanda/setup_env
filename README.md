@@ -5,11 +5,13 @@
 
 Clone repository
 
-Navigate to repository and run `source setup_en.sh`
+`chmod +x setup_env.sh`
 
-**If you do not use `source` for the initial run, either reload your session or run the provided code snippets yourself upon completion of the script**
+`sudo ./setup_env.sh`
 
-Follow prompts, be precise with Directory and Variable settings.
+**Once the script is done and setup is complete please run `source ~/.zshrc` or `source ~/.bashrc` to finalize the variable changes**
+
+Follow prompts, be precise with Directory and Variable settings. **sudo necessary for adding hosts to /etc/hosts file**
 
 #### Features ####
 
