@@ -67,7 +67,7 @@ if [ "$organizeFolder" == "y" ]; then
                 printf "${REDBACK}Directory does not exist!${NORMAL} Try again.\n"
             fi    
         else
-            mkdir -p ./"$folderName"/{scans,notes,scripts,exploits}
+            mkdir -p ./"$folderName"/{scans,notes,scripts,exploits} # Creates folder and subdirectories in the current directory
             printf "Created ${GREEN}$folderName${NORMAL} folder with the following subdirectories: ${GREEN}scans, notes, scripts, and exploits${NORMAL}\n"
             break
         fi
