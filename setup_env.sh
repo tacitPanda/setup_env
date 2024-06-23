@@ -13,7 +13,7 @@ printf "========================================================================
 
 sleep 1
 
-read -p "What is the IP address of the target machine?: " ipAddress
+read -rp "What is the IP address of the target machine?: " ipAddress
 
 printf "Adding ${GREEN}$ipAddress${NORMAL} to ~/.zshrc or ~/.bashrc depending on your shell. Variable will be "\$ip"\n"
 
@@ -51,21 +51,20 @@ if [ "$findShell" == "" ]; then # Prompts user with the command to add the varia
     printf "${REDBACK}No shell configuration file found.${NORMAL} Please add the following line to your shell configuration file using the following command: echo "export ip=$ipAddress" >> PATH_TO_yOUR_SHELL_RC"
 fi
 
-read -p "Would you like to organize a folder for this challenge? (y/n): " organizeFolder
+read -rp "Would you like to organize a folder for this challenge? (y/n): " organizeFolder
 
 if [ "$organizeFolder" == "y" ]; then
-    read -p "What is the name of the folder you would like to create?: " folderName
-    read -p "Do you want to create this folder in a directory other than the current directory? (y/n): " otherDirectory
+    read -rp "What is the name of the folder you would like to create?: " folderName
+    read -rp "Do you want to create this folder in a directory other than the current directory? (y/n): " otherDirectory
     while true; do
         if [ "$otherDirectory" == "y" ]; then
-            read -p "What is the path to the directory you would like to create the folder in?: " directoryPath
+            read -rp "What is the path to the directory you would like to create the folder in? Please use an ${REDBACK}absolute path${NORMAL}: " directoryPath
             if [ -d "$directoryPath" ]; then
                 mkdir -p "$directoryPath/$folderName"/{scans,notes,scripts,exploits} # Creates the folder and subdirectories based on path provided from directoryPath
                 printf "Created ${GREEN}$folderName${NORMAL} in ${GREEN}$directoryPath${NORMAL} with the following subdirectories: ${GREEN}scans, notes, scripts, and exploits${NORMAL}\n"
                 break
             else
-                printf "${REDBACK}Directory does not exist!${NORMAL} Please create the directory and run the script again\n"
-                # If you want to ask again, remove the break statement.
+                printf "${REDBACK}Directory does not exist!${NORMAL} Try again.\n"
             fi    
         else
             mkdir -p ./"$folderName"/{scans,notes,scripts,exploits}
@@ -79,10 +78,10 @@ if [ "$organizeFolder" == "n" ]; then
     printf "${RED}No folder created${NORMAL}\n"
 fi
 
-read -p "Lastly, do you have a hostname for the target machine? ${REDBACK}NOTE:${NORMAL} If you did not run this script with sudo privileges the /etc/hosts file will not be updated! (y/n): " hostnameChoice
+read -rp "Lastly, do you have a hostname for the target machine? ${REDBACK}NOTE:${NORMAL} If you did not run this script with sudo privileges the /etc/hosts file will not be updated! (y/n): " hostnameChoice
 
 if [ "$hostnameChoice" == "y" ]; then
-    read -p "What is the hostname of the target machine? ${RED}If you have multiple seperate them by a space:${NORMAL} " hostname
+    read -rp "What is the hostname of the target machine? ${RED}If you have multiple seperate them by a space:${NORMAL} " hostname
     printf "Adding ${GREEN}$hostname${NORMAL} to your /etc/hosts file\n"
     echo "$ipAddress $hostname" >> /etc/hosts
 fi
