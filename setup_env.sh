@@ -78,12 +78,18 @@ if [ "$organizeFolder" == "n" ]; then
     printf "${RED}No folder created${NORMAL}\n"
 fi
 
-read -rp "Lastly, do you have a hostname for the target machine? ${REDBACK}NOTE:${NORMAL} If you did not run this script with sudo privileges the /etc/hosts file will not be updated! (y/n): " hostnameChoice
+read -rp "Lastly, do you have a hostname for the target machine? (y/n): " hostnameChoice
 
 if [ "$hostnameChoice" == "y" ]; then
     read -rp "What is the hostname of the target machine? ${RED}If you have multiple seperate them by a space:${NORMAL} " hostname
-    printf "Adding ${GREEN}$hostname${NORMAL} to your /etc/hosts file\n"
-    echo "$ipAddress $hostname" >> /etc/hosts
+    read -rp "You will be prompted for your sudo password as this operation requires root privileges. Press enter to continue.\n"
+    
+    if grep -q "$ipAddress" /etc/hosts; then
+        sudo sed -i "/^$ipAddress\s/c\\$ipAddress $hostname" /etc/hosts
+    else
+        echo "$ipAddress $hostname" | sudo tee -a /etc/hosts
+    fi
+    printf "Added ${GREEN}$hostname${NORMAL} to your /etc/hosts file.\n"
 fi
 
 printf "${REDBACK}REMEMBER:${NORMAL} Use source ~/NAME_OF_YOUR_CONFIG to finalize variables set for your environment.\n${GREEN}Setup complete!${NORMAL} Remember, when all else fails, ENUMERATE!\n"
