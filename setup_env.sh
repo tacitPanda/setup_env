@@ -81,8 +81,8 @@ fi
 read -rp "Lastly, do you have a hostname for the target machine? (y/n): " hostnameChoice
 
 if [ "$hostnameChoice" == "y" ]; then
-    read -rp "What is the hostname of the target machine? ${RED}If you have multiple seperate them by a space:${NORMAL} " hostname
-    read -rp "You will be prompted for your sudo password as this operation requires root privileges. Press enter to continue.\n"
+    read -rp "What is the hostname of the target machine? ${RED}If you have multiple separate them by a space:${NORMAL} " hostname
+    read -rp "You will be prompted for your sudo password as this operation requires root privileges. Press enter to continue."
     
     if grep -q "$ipAddress" /etc/hosts; then
         sudo sed -i "/^$ipAddress\s/c\\$ipAddress $hostname" /etc/hosts
