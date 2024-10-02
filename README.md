@@ -11,7 +11,7 @@ Clone repository
 
 **Once the script is done and setup is complete please run `source ~/.zshrc` or `source ~/.bashrc` to finalize the variable changes**
 
-Follow prompts, be precise with Directory and Variable settings. There is no checking currently for accurate IP address or /etc/hosts format.
+Follow prompts, be precise with Directory and Variable settings. **There is no error checking currently.**
 
 #### Features ####
 
