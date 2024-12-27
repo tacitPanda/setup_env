@@ -1,6 +1,6 @@
 ## setup_env
 
-Just a quick script to get some variables setup and some files modified to make life a little easier.
+Just a quick script to get some variables setup and some files modified to make life a little easier when doing CTFs.
 
 #### How to run ####
 
