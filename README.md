@@ -1,5 +1,6 @@
+## setup_env
 
-### DISCLAIMER: This is for PERSONAL use ONLY! I do not recommend taking random forks from random people as this could compromise and damage your system should you run it from the wrong place. ###
+Just a quick script to get some variables setup and some files modified to make life a little easier.
 
 #### How to run ####
 
@@ -11,7 +12,7 @@ Clone repository
 
 **Once the script is done and setup is complete please run `source ~/.zshrc` or `source ~/.bashrc` to finalize the variable changes**
 
-Follow prompts, be precise with Directory and Variable settings. There is no checking currently for accurate IP address or /etc/hosts format.
+Follow prompts, be precise with Directory and Variable settings. **There is no error checking currently.**
 
 #### Features ####
 
