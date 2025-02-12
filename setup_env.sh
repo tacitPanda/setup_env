@@ -13,6 +13,11 @@ printf "========================================================================
 
 sleep 1
 
+set_ip=0
+set_hosts=0
+ip_value=""
+host_value=""
+
 read -rp "What is the IP address of the target machine?: " ipAddress
 
 printf "Adding ${GREEN}$ipAddress${NORMAL} to ~/.zshrc or ~/.bashrc depending on your shell. Variable will be "\$ip"\n"
