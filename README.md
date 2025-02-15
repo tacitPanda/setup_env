@@ -1,8 +1,8 @@
 ## setup_env
 
-Just a quick script to get some variables setup and some files modified to make life a little easier when doing CTFs.
+Just a quick script to get some variables setup and some files modified to make life a little easier when doing CTFs. With one line and a few flags you can setup your environment with a IP variable, Hostnames, and a working Directory for organization.
 
-#### How to run ####
+#### How to run 
 
 Clone repository
 
@@ -10,9 +10,16 @@ Clone repository
 
 `./setup_env.sh`
 
+Alternatively you can mv the script to a folder located in your $PATH
+
 **Once the script is done and setup is complete please run `source ~/.zshrc` or `source ~/.bashrc` to finalize the variable changes**
 
-Follow prompts, be precise with Directory and Variable settings. **There is no error checking currently.**
+#### Usage:
+
+-i <value>   Set an IP address as the target
+-n <host>    Add a host entry to /etc/hosts
+-d <directory>    Setup a directory for organization of findings, exploits, scripts, and files" 
+
 
 #### Features ####
 
