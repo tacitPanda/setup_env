@@ -16,10 +16,9 @@ Alternatively you can mv the script to a folder located in your $PATH
 
 #### Usage:
 
-  -i <value>   Set an IP address as the target
-  -n <host>    Add a host entry to /etc/hosts
-  -d <directory>    Setup a directory for organization of findings, exploits, scripts, and files
-
+-  -i :   Set an IP address as the target
+-  -n :   Add a host entry to /etc/hosts
+-  -d :   Setup a directory for organization of findings, exploits, scripts, and files
 
 #### Features ####
 
