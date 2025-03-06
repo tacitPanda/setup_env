@@ -1,3 +1,23 @@
+validate_ip() {
+    local ip="$1"
+    local regex='^([0-9]{1,3}\.){3}[0-9]{1,3}$'
+    
+    if [[ $ip =~ $regex ]]; then
+        IFS='.' read -r -a octets <<< "$ip"
+        for octet in "${octets[@]}"; do
+            if ((octet < 0 || octet > 255)); then
+                echo "Invalid IP: Octet out of range"
+                return 1
+            fi
+        done
+        echo "Valid IP"
+        return 0
+    else
+        echo "Invalid IP: Format error"
+        return 1
+    fi
+}
+
 #!/bin/bash
 
 RED=$(tput setaf 1)
@@ -18,7 +38,7 @@ usage() {
 
     echo "  -i  Set an IP address as the target"
     echo "  -n  Add a host entry to /etc/hosts"
-    echo "  -d  Setup a directory for organization of findings, exploits, scripts, and files"
+    echo "  -d  Setup a directory for organization of findings, exploits, scripts, and files. Sub folders are created automatically"
     echo "  -h  Displays this message"
     exit 1
 }
@@ -28,6 +48,9 @@ while getopts "i:n:d:" opt; do
         i)
             set_ip=1
             ip_value="$OPTARG"
+            if ! validate_ip "$ip_value"; then
+                exit 1
+            fi
             ;;
         n)
             set_hosts=1
@@ -74,7 +97,7 @@ if [[ $set_ip -eq 1 ]]; then
     fi
 
     if [ "$findShell" == "" ]; then # Prompts user with the command to add the variable manually if no shell was found
-    printf "${REDBACK}No shell configuration file found.${NORMAL} Please add the following line to your shell configuration file using the following command: echo "export ip=$ipAddress" >> PATH_TO_yOUR_SHELL_RC"
+    printf "${REDBACK}No shell configuration file found.${NORMAL} Please add the following line to your shell configuration file using the following command: echo \"export ip=$ipAddress\" >> PATH_TO_yOUR_SHELL_RC"
     fi
 fi
 
@@ -90,6 +113,6 @@ if [[ $set_hosts -eq 1 ]]; then
 fi
 
 if [[ $set_folder -eq 1 ]]; then
-    mkdir -p ./"$folder_value"/{scans,notes,scripts,exploits} # Creates folder and subdirectories in the current directory
+    mkdir -p ./$folder_value/{scans,notes,scripts,exploits} # Creates folder and subdirectories in the current directory
     printf "Created ${GREEN}$folder_value${NORMAL} folder with the following subdirectories: ${GREEN}scans, notes, scripts, and exploits${NORMAL}\n"
 fi
