@@ -1,3 +1,18 @@
+#!/bin/bash
+
+RED=$(tput setaf 1)
+REDBACK=$(tput setab 1)
+GREEN=$(tput setaf 2)
+BOLDRED=$(tput setaf 1; tput bold)
+NORMAL=$(tput sgr0)
+
+set_ip=0
+set_hosts=0
+set_folder=0
+ip_value=""
+hosts_value=""
+folder_value=""
+
 validate_ip() {
     local ip="$1"
     local regex='^([0-9]{1,3}\.){3}[0-9]{1,3}$'
@@ -17,21 +32,6 @@ validate_ip() {
         return 1
     fi
 }
-
-#!/bin/bash
-
-RED=$(tput setaf 1)
-REDBACK=$(tput setab 1)
-GREEN=$(tput setaf 2)
-BOLDRED=$(tput setaf 1; tput bold)
-NORMAL=$(tput sgr0)
-
-set_ip=0
-set_hosts=0
-set_folder=0
-ip_value=""
-hosts_value=""
-folder_value=""
 
 usage() {
     echo "Usage: $0 [-i IP] [-n hosts/subdomains] [-d directory]"
