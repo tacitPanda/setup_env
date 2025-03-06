@@ -16,9 +16,10 @@ folder_value=""
 usage() {
     echo "Usage: $0 [-i IP] [-n hosts/subdomains] [-d directory]"
 
-    echo "  -i <value>   Set an IP address as the target"
-    echo "  -n <host>    Add a host entry to /etc/hosts"
-    echo "  -d <directory>    Setup a directory for organization of findings, exploits, scripts, and files" 
+    echo "  -i  Set an IP address as the target"
+    echo "  -n  Add a host entry to /etc/hosts"
+    echo "  -d  Setup a directory for organization of findings, exploits, scripts, and files"
+    echo "  -h  Displays this message"
     exit 1
 }
 
@@ -36,6 +37,10 @@ while getopts "i:n:d:" opt; do
             set_folder=1
             folder_value="$OPTARG"
             ;;
+
+        h) usage
+            ;;
+
         ?) usage ;;
     esac
 done
