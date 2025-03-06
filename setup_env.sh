@@ -22,13 +22,13 @@ usage() {
     exit 1
 }
 
-while getopts "i:h:d:" opt; do
+while getopts "i:n:d:" opt; do
     case "$opt" in
         i)
             set_ip=1
             ip_value="$OPTARG"
             ;;
-        h)
+        n)
             set_hosts=1
             hosts_value="$OPTARG"
             ;;
