@@ -75,11 +75,9 @@ if [[ $set_ip -eq 1 ]]; then
     if [ "$findShell" == "/usr/bin/zsh" ] || [ "$findShell" == "/bin/zsh" ]; then # Compares ouput of findShell to discern if zsh or bash is being used. I feel like this could be done more efficiently...
         if grep -q "$ipString" ~/.zshrc; then 
             sed -i "/export ip=*/c\export ip=$ip_value" ~/.zshrc # Updates variable if it already exists
-            sleep 1
             printf "Updated the ip address variable for your shell ~/.zshrc to ${GREEN}$ip_value${NORMAL}. The variable has been set to ${GREEN}\$ip${NORMAL}\n"
         else 
             echo "export ip=$ip_value" >> ~/.zshrc # Adds variable if it does not exist
-            sleep 1
             printf "Added ${GREEN}$ip_value${NORMAL} to ~/.zshrc. The variable is ${GREEN}\$ip${NORMAL}\n"
         fi
     fi
@@ -87,11 +85,9 @@ if [[ $set_ip -eq 1 ]]; then
     if [ "$findShell" == "/usr/bin/bash" ] || [ "$findShell" == "/bin/bash" ]; then # Does the same as above but for bash
         if grep -q "$ipString" ~/.bashrc; then
             sed -i "/export ip=*/c\export ip=$ip_value" ~/.bashrc
-            sleep 1
             printf "Upated the ip address variable for your shell ~/.bashrc to ${GREEN}$ip_value${NORMAL}. The variable has been set to ${GREEN}\$ip${NORMAL}\n"
         else
             echo "export ip=$ip_value" >> ~/.bashrc
-            sleep 1
             printf "Added ${GREEN}$ip_value${NORMAL} to ~/.bashrc. The variable is ${GREEN}\$ip${NORMAL}\n"
         fi
     fi
