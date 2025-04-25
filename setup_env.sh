@@ -1,9 +1,7 @@
 #!/bin/bash
 
-RED=$(tput setaf 1)
 REDBACK=$(tput setab 1)
 GREEN=$(tput setaf 2)
-BOLDRED=$(tput setaf 1; tput bold)
 NORMAL=$(tput sgr0)
 
 set_ip=0
@@ -43,7 +41,7 @@ usage() {
     exit 1
 }
 
-while getopts "i:n:d:" opt; do
+while getopts "i:n:d:h" opt; do
     case "$opt" in
         i)
             set_ip=1
@@ -75,25 +73,30 @@ if [[ $set_ip -eq 1 ]]; then
     if [ "$findShell" == "/usr/bin/zsh" ] || [ "$findShell" == "/bin/zsh" ]; then # Compares ouput of findShell to discern if zsh or bash is being used. I feel like this could be done more efficiently...
         if grep -q "$ipString" ~/.zshrc; then 
             sed -i "/export ip=*/c\export ip=$ip_value" ~/.zshrc # Updates variable if it already exists
-            printf "Updated the ip address variable for your shell ~/.zshrc to ${GREEN}$ip_value${NORMAL}. The variable has been set to ${GREEN}\$ip${NORMAL}\n"
+            printf "Updated the ip address variable for your shell ~/.zshrc to %s%s%s. The variable has been set to %s%s%s\n" \
+              "$GREEN" "$ip_value" "$NORMAL" "$GREEN" "$ip" "$NORMAL"
         else 
             echo "export ip=$ip_value" >> ~/.zshrc # Adds variable if it does not exist
-            printf "Added ${GREEN}$ip_value${NORMAL} to ~/.zshrc. The variable is ${GREEN}\$ip${NORMAL}\n"
+            printf "Added %s%s%s to ~/.zshrc. The variable is %s%s%s\n" \
+              "$GREEN" "$ip_value" "$NORMAL" "$GREEN" "$ip" "$NORMAL"  
         fi
     fi
 
     if [ "$findShell" == "/usr/bin/bash" ] || [ "$findShell" == "/bin/bash" ]; then # Does the same as above but for bash
         if grep -q "$ipString" ~/.bashrc; then
             sed -i "/export ip=*/c\export ip=$ip_value" ~/.bashrc
-            printf "Upated the ip address variable for your shell ~/.bashrc to ${GREEN}$ip_value${NORMAL}. The variable has been set to ${GREEN}\$ip${NORMAL}\n"
+            printf "Upated the ip address variable for your shell ~/.bashrc to %s%s%s. The variable has been set to %s%s%s\n" \
+              "$GREEN" "$ip_value" "$NORMAL" "$GREEN" "$ip" "$NORMAL"
         else
             echo "export ip=$ip_value" >> ~/.bashrc
-            printf "Added ${GREEN}$ip_value${NORMAL} to ~/.bashrc. The variable is ${GREEN}\$ip${NORMAL}\n"
+            printf "Added %s%s%s to ~/.bashrc. The variable is %s%s%s\n" \
+              "$GREEN" "$ip_value" "$NORMAL" "$GREEN" "$ip" "$NORMAL"
         fi
     fi
 
     if [ "$findShell" == "" ]; then # Prompts user with the command to add the variable manually if no shell was found
-    printf "${REDBACK}No shell configuration file found.${NORMAL} Please add the following line to your shell configuration file using the following command: echo \"export ip=$ipAddress\" >> PATH_TO_yOUR_SHELL_RC"
+    printf "%sNo shell configuration file found.%s Please add the following line to your shell configuration file using the following command: echo \"export ip=%s\" >> PATH_TO_YOUR_SHELL_RC" \
+      "$REDBACK" "$NORMAL" "$ip_value"
     fi
 fi
 
@@ -105,10 +108,12 @@ if [[ $set_hosts -eq 1 ]]; then
     else
         echo "$ip_value"$'\t'"$hosts_value" | sudo tee -a /etc/hosts
     fi
-    printf "Added ${GREEN}$hosts_value${NORMAL} to your /etc/hosts file.\n"
+    printf "Added %s%s%s to your /etc/hosts file.\n" \
+      "$GREEN" "$hosts_value" "$NORMAL"
 fi
 
 if [[ $set_folder -eq 1 ]]; then
-    mkdir -p ./$folder_value/{scans,notes,scripts,exploits} # Creates folder and subdirectories in the current directory
-    printf "Created ${GREEN}$folder_value${NORMAL} folder with the following subdirectories: ${GREEN}scans, notes, scripts, and exploits${NORMAL}\n"
+    mkdir -p ./"$folder_value"/{scans,notes,scripts,exploits} # Creates folder and subdirectories in the current directory
+    printf "Created %s%s%s folder with the following subdirectories: %sscans, notes, scripts, and exploits%s\n" \
+      "$GREEN" "$folder_value" "$NORMAL" "$GREEN" "$NORMAL"
 fi
