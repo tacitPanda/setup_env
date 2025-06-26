@@ -168,3 +168,9 @@ if [[ $set_folder -eq 1 ]]; then
     printf "Created %s%s%s folder with subdirectories: %sscans, notes, scripts, exploits%s\n" \
         "$GREEN" "$folder_value" "$NORMAL" "$GREEN" "$NORMAL"
 fi
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  echo
+  echo "To apply the updated environment variable now, run:"
+  echo "  source ~/.${shell_type}rc"
+fi
