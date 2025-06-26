@@ -23,7 +23,6 @@ validate_ip() {
                 return 1
             fi
         done
-        echo "Valid IP"
         return 0
     else
         echo "Invalid IP: Format error"
@@ -33,11 +32,10 @@ validate_ip() {
 
 usage() {
     echo "Usage: $0 [-i IP] [-n hosts/subdomains] [-d directory]"
-
     echo "  -i  Set an IP address as the target"
     echo "  -n  Add a host entry to /etc/hosts"
-    echo "  -d  Setup a directory for organization of findings, exploits, scripts, and files. Sub folders are created automatically"
-    echo "  -h  Displays this message"
+    echo "  -d  Setup a directory for organizing findings, exploits, scripts, and files"
+    echo "  -h  Display this help message"
     exit 1
 }
 
@@ -58,62 +56,115 @@ while getopts "i:n:d:h" opt; do
             set_folder=1
             folder_value="$OPTARG"
             ;;
-
-        h) usage
+        h)
+            usage
             ;;
-
-        ?) usage ;;
+        ?)
+            usage
+            ;;
     esac
 done
 
-if [[ $set_ip -eq 1 ]]; then
-    ipString="export ip="
-    findShell=$(env | grep -w "SHELL" | cut -d "=" -f 2)
+# Attempt to source ip from shell config
+if [[ $set_ip -eq 0 ]]; then
+    shell_rc=""
+    shell_type=$(basename "$SHELL")
 
-    if [ "$findShell" == "/usr/bin/zsh" ] || [ "$findShell" == "/bin/zsh" ]; then # Compares ouput of findShell to discern if zsh or bash is being used. I feel like this could be done more efficiently...
-        if grep -q "$ipString" ~/.zshrc; then 
-            sed -i "/export ip=*/c\export ip=$ip_value" ~/.zshrc # Updates variable if it already exists
-            printf "Updated the ip address variable for your shell ~/.zshrc to %s%s%s. The variable has been set to %s%s%s\n" \
-              "$GREEN" "$ip_value" "$NORMAL" "$GREEN" "$ip" "$NORMAL"
-        else 
-            echo "export ip=$ip_value" >> ~/.zshrc # Adds variable if it does not exist
-            printf "Added %s%s%s to ~/.zshrc. The variable is %s%s%s\n" \
-              "$GREEN" "$ip_value" "$NORMAL" "$GREEN" "$ip" "$NORMAL"  
-        fi
+    if [[ $shell_type == "zsh" ]]; then
+        shell_rc="$HOME/.zshrc"
+    elif [[ $shell_type == "bash" ]]; then
+        shell_rc="$HOME/.bashrc"
     fi
 
-    if [ "$findShell" == "/usr/bin/bash" ] || [ "$findShell" == "/bin/bash" ]; then # Does the same as above but for bash
-        if grep -q "$ipString" ~/.bashrc; then
-            sed -i "/export ip=*/c\export ip=$ip_value" ~/.bashrc
-            printf "Upated the ip address variable for your shell ~/.bashrc to %s%s%s. The variable has been set to %s%s%s\n" \
-              "$GREEN" "$ip_value" "$NORMAL" "$GREEN" "$ip" "$NORMAL"
+    if [[ -f "$shell_rc" ]]; then
+        ip_line=$(grep -E '^export ip=' "$shell_rc")
+        if [[ -n "$ip_line" ]]; then
+            ip_value=$(echo "$ip_line" | cut -d '=' -f2)
+            if validate_ip "$ip_value"; then
+                echo "Found IP in $shell_rc: $ip_value"
+            else
+                echo "Found IP in $shell_rc, but it's invalid. Prompting for new one..."
+                set_ip=1
+            fi
         else
-            echo "export ip=$ip_value" >> ~/.bashrc
-            printf "Added %s%s%s to ~/.bashrc. The variable is %s%s%s\n" \
-              "$GREEN" "$ip_value" "$NORMAL" "$GREEN" "$ip" "$NORMAL"
+            echo "No export ip= line found in $shell_rc"
+            set_ip=1
+        fi
+    else
+        echo "Shell config file not found. Cannot read IP from it."
+        set_ip=1
+    fi
+fi
+
+# Update shell config if IP was manually provided or missing
+if [[ $set_ip -eq 1 ]]; then
+    if [[ -z "$ip_value" ]]; then
+        read -rp "Enter an IP address to set: " ip_value
+        if ! validate_ip "$ip_value"; then
+            echo "Invalid IP. Exiting."
+            exit 1
         fi
     fi
 
-    if [ "$findShell" == "" ]; then # Prompts user with the command to add the variable manually if no shell was found
-    printf "%sNo shell configuration file found.%s Please add the following line to your shell configuration file using the following command: echo \"export ip=%s\" >> PATH_TO_YOUR_SHELL_RC" \
-      "$REDBACK" "$NORMAL" "$ip_value"
+    shell_rc=""
+    shell_type=$(basename "$SHELL")
+
+    if [[ $shell_type == "zsh" ]]; then
+        shell_rc="$HOME/.zshrc"
+    elif [[ $shell_type == "bash" ]]; then
+        shell_rc="$HOME/.bashrc"
+    fi
+
+    if [[ -n "$shell_rc" && -f "$shell_rc" ]]; then
+        if grep -q '^export ip=' "$shell_rc"; then
+            sed -i "/^export ip=/c\export ip=$ip_value" "$shell_rc"
+            echo "Updated export ip= to $ip_value in $shell_rc"
+        else
+            echo "export ip=$ip_value" >> "$shell_rc"
+            echo "Added export ip=$ip_value to $shell_rc"
+        fi
+    else
+        printf "%sNo shell config file detected. Add the following line manually:\necho \"export ip=%s\" >> ~/.zshrc or ~/.bashrc\n%s" "$REDBACK" "$ip_value" "$NORMAL"
     fi
 fi
 
 if [[ $set_hosts -eq 1 ]]; then
-    read -rp "You will be prompted for your sudo password as adding hostnames requires root privileges. Press enter to continue."
-    
-    if grep -q "$ip_value" /etc/hosts; then
-        sudo sed -i "/^$ip_value\s/c\\$ip_value $hosts_value" /etc/hosts
-    else
-        echo "$ip_value"$'\t'"$hosts_value" | sudo tee -a /etc/hosts
+    if [[ -z "$ip_value" ]]; then
+        echo "IP value is not set. Cannot continue with /etc/hosts update."
+        exit 1
     fi
-    printf "Added %s%s%s to your /etc/hosts file.\n" \
-      "$GREEN" "$hosts_value" "$NORMAL"
+
+    read -rp "You will be prompted for your sudo password. Press enter to continue."
+    sudo -v || exit 1
+
+    backup_file="/etc/hosts.bak"
+
+    if [ -e "$backup_file" ]; then
+        read -p "Backup of /etc/hosts exists. Overwrite? (y/N): " answer
+        if [[ "$answer" =~ ^[Yy] ]]; then
+            sudo cp /etc/hosts "$backup_file"
+            echo "Backup overwritten."
+        else
+            echo "Skipping backup."
+        fi
+    else
+        sudo cp /etc/hosts "$backup_file"
+        echo "Backup created."
+    fi
+
+    if grep -q -E "^$ip_value[[:space:]]+" /etc/hosts; then
+        sudo sed -i -E "s|^$ip_value[[:space:]]+.*|$ip_value $hosts_value|" /etc/hosts
+        echo "Updated existing entry for $ip_value"
+    else
+        echo -e "$ip_value\t$hosts_value" | sudo tee -a /etc/hosts > /dev/null
+        echo "Added new entry for $ip_value"
+    fi
+
+    printf "Added %s%s%s to your /etc/hosts file.\n" "$GREEN" "$hosts_value" "$NORMAL"
 fi
 
 if [[ $set_folder -eq 1 ]]; then
-    mkdir -p ./"$folder_value"/{scans,notes,scripts,exploits} # Creates folder and subdirectories in the current directory
-    printf "Created %s%s%s folder with the following subdirectories: %sscans, notes, scripts, and exploits%s\n" \
-      "$GREEN" "$folder_value" "$NORMAL" "$GREEN" "$NORMAL"
+    mkdir -p ./"$folder_value"/{scans,notes,scripts,exploits}
+    printf "Created %s%s%s folder with subdirectories: %sscans, notes, scripts, exploits%s\n" \
+        "$GREEN" "$folder_value" "$NORMAL" "$GREEN" "$NORMAL"
 fi
