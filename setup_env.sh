@@ -65,17 +65,18 @@ while getopts "i:n:d:h" opt; do
     esac
 done
 
+# Determine shell config file
+shell_rc=""
+shell_type=$(basename "$SHELL")
+
+if [[ $shell_type == "zsh" ]]; then
+    shell_rc="$HOME/.zshrc"
+elif [[ $shell_type == "bash" ]]; then
+    shell_rc="$HOME/.bashrc"
+fi
+
 # Attempt to source ip from shell config
 if [[ $set_ip -eq 0 ]]; then
-    shell_rc=""
-    shell_type=$(basename "$SHELL")
-
-    if [[ $shell_type == "zsh" ]]; then
-        shell_rc="$HOME/.zshrc"
-    elif [[ $shell_type == "bash" ]]; then
-        shell_rc="$HOME/.bashrc"
-    fi
-
     if [[ -f "$shell_rc" ]]; then
         ip_line=$(grep -E '^export ip=' "$shell_rc")
         if [[ -n "$ip_line" ]]; then
@@ -106,15 +107,6 @@ if [[ $set_ip -eq 1 ]]; then
         fi
     fi
 
-    shell_rc=""
-    shell_type=$(basename "$SHELL")
-
-    if [[ $shell_type == "zsh" ]]; then
-        shell_rc="$HOME/.zshrc"
-    elif [[ $shell_type == "bash" ]]; then
-        shell_rc="$HOME/.bashrc"
-    fi
-
     if [[ -n "$shell_rc" && -f "$shell_rc" ]]; then
         if grep -q '^export ip=' "$shell_rc"; then
             sed -i "/^export ip=/c\export ip=$ip_value" "$shell_rc"
@@ -123,6 +115,9 @@ if [[ $set_ip -eq 1 ]]; then
             echo "export ip=$ip_value" >> "$shell_rc"
             echo "Added export ip=$ip_value to $shell_rc"
         fi
+        # Export the IP for the current shell session
+        export ip="$ip_value"
+        echo "Environment updated with new IP value"
     else
         printf "%sNo shell config file detected. Add the following line manually:\necho \"export ip=%s\" >> ~/.zshrc or ~/.bashrc\n%s" "$REDBACK" "$ip_value" "$NORMAL"
     fi
@@ -134,8 +129,15 @@ if [[ $set_hosts -eq 1 ]]; then
         exit 1
     fi
 
-    read -rp "You will be prompted for your sudo password. Press enter to continue."
-    sudo -v || exit 1
+    echo "You will be prompted for your sudo password to update /etc/hosts."
+    echo -n "Press enter to continue..."
+    read
+
+    # Request sudo access - this will prompt for password
+    if ! sudo -k && sudo true; then
+        echo "Failed to obtain sudo privileges. Exiting."
+        exit 1
+    fi
 
     backup_file="/etc/hosts.bak"
 
@@ -153,10 +155,10 @@ if [[ $set_hosts -eq 1 ]]; then
     fi
 
     if grep -q -E "^$ip_value[[:space:]]+" /etc/hosts; then
-        sudo sed -i -E "s|^$ip_value[[:space:]]+.*|$ip_value $hosts_value|" /etc/hosts
+        sudo sed -i -E "s|^$ip_value[[:space:]]+.*|$ip_value	$hosts_value|" /etc/hosts
         echo "Updated existing entry for $ip_value"
     else
-        echo -e "$ip_value\t$hosts_value" | sudo tee -a /etc/hosts > /dev/null
+        echo "$ip_value	$hosts_value" | sudo tee -a /etc/hosts > /dev/null
         echo "Added new entry for $ip_value"
     fi
 
@@ -169,8 +171,5 @@ if [[ $set_folder -eq 1 ]]; then
         "$GREEN" "$folder_value" "$NORMAL" "$GREEN" "$NORMAL"
 fi
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  echo
-  echo "To apply the updated environment variable now, run:"
-  echo "  source ~/.${shell_type}rc"
-fi
+echo
+echo "Setup complete!"
